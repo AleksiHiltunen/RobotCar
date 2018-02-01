@@ -1,95 +1,76 @@
+#!/usr/bin/python3
+
 # Import required libraries
 import sys
 import time
 import RPi.GPIO as GPIO
-from multiprocessing import Process
 import threading
 
-# Use BCM GPIO references
-# instead of physical pin numbers
-#GPIO.setmode(GPIO.BCM)
-mode=GPIO.getmode()
-GPIO.cleanup()
-
-# Define GPIO signals to use
-# Physical pins 11,15,16,18
-# GPIO17,GPIO22,GPIO23,GPIO24
-
-StepLeftPinForward=16
-StepLeftPinBackward=18
-StepRightPinBackward=13
-StepRightPinForward=15
-
-sleeptime=1
-
-GPIO.setmode(GPIO.BOARD)
-GPIO.setup(StepLeftPinForward, GPIO.OUT)
-GPIO.setup(StepLeftPinBackward, GPIO.OUT)
-GPIO.setup(StepRightPinForward, GPIO.OUT)
-GPIO.setup(StepRightPinBackward, GPIO.OUT)
-
-def setup():
-    StepLeftPinForward=16
-    StepLeftPinBackward=18
-    StepRightPinBackward=13
-    StepRightPinForward=15
-
-    sleeptime=1
-
-    GPIO.setmode(GPIO.BOARD)
-    GPIO.setup(StepLeftPinForward, GPIO.OUT)
-    GPIO.setup(StepLeftPinBackward, GPIO.OUT)
-    GPIO.setup(StepRightPinForward, GPIO.OUT)
-    GPIO.setup(StepRightPinBackward, GPIO.OUT)
-
-def _left_forward():
-    GPIO.output(StepLeftPinForward, GPIO.HIGH)
-
-def _left_back(x):
-    GPIO.output(StepLeftPinBackward, GPIO.HIGH)
-
-def _right_forward():
-    GPIO.output(StepRightPinForward, GPIO.HIGH)
-
-def _right_back():
-    GPIO.output(StepRightPinBackward, GPIO.HIGH)
-
-def _right_stop():
-    GPIO.output(StepRightPinBackward, GPIO.LOW)
-    GPIO.output(StepRightPinForward, GPIO.LOW)
-
-def _left_stop():
-    GPIO.output(StepLeftPinBackward, GPIO.LOW)
-    GPIO.output(StepLeftPinForward, GPIO.LOW)
-
-def forward(x):
-    left_f = threading.Thread(name="left_forward", target=_left_forward)
-    right_f = threading.Thread(name="right_forward", target=_right_forward)
-    left_f.start()
-    right_f.start()
-
-def back(x):
-    left_b = threading.Thread(name="left_back", target=_left_back)
-    right_b = threading.Thread(name="right_back", target=_right_back)
-    left_b.start()
-    right_b.start()
-
-def stop():
-    _right_stop()
-    _left_stop()
-
-def left(x):
-    GPIO.output(StepLeftPinBackward, GPIO.HIGH)
-    time.sleep(x)
-    GPIO.output(StepLeftPinBackward, GPIO.LOW)
-
-def right(x):
-    GPIO.output(StepRightPinBackward, GPIO.HIGH)
-    time.sleep(x)
-    GPIO.output(StepRightPinBackward, GPIO.LOW)
+class Motor():
+	def __init__(self):
+		self.StepLeftPinForward=23
+		self.StepLeftPinBackward=24
+		self.StepRightPinBackward=27
+		self.StepRightPinForward=22
+		mode=GPIO.getmode()
+		GPIO.setmode(GPIO.BCM)
+		GPIO.setup(self.StepLeftPinForward, GPIO.OUT)
+		GPIO.setup(self.StepLeftPinBackward, GPIO.OUT)
+		GPIO.setup(self.StepRightPinForward, GPIO.OUT)
+		GPIO.setup(self.StepRightPinBackward, GPIO.OUT)
 
 
-def cleanup():
-    GPIO.cleanup()
+	def left_forward(self):
+		GPIO.output(self.StepLeftPinForward, GPIO.HIGH)
+		time.sleep(x)
 
-GPIO.cleanup()
+	def left_back(self):
+		GPIO.output(self.StepLeftPinBackward, GPIO.HIGH)
+
+	def right_forward(self):
+		GPIO.output(self.StepRightPinForward, GPIO.HIGH)
+		time.sleep(x)
+
+	def right_back(self):
+		GPIO.output(self.StepRightPinBackward, GPIO.HIGH)
+
+	def right_stop(self):
+		GPIO.output(self.StepRightPinBackward, GPIO.LOW)
+		GPIO.output(self.StepRightPinForward, GPIO.LOW)
+
+	def left_stop(self):
+		GPIO.output(self.StepLeftPinBackward, GPIO.LOW)
+		GPIO.output(self.StepLeftPinForward, GPIO.LOW)
+
+	def back(self, x):
+		print("Back")
+		GPIO.output(self.StepRightPinForward, GPIO.HIGH)
+		GPIO.output(self.StepLeftPinForward, GPIO.HIGH)
+		time.sleep(x)
+		self.stop()
+
+	def forward(self):
+		print("Forward")
+		left = threading.Thread(name="left_back", target=self.left_back)
+		right = threading.Thread(name="right_back", target=self.right_back)
+		left.start()
+		right.start()
+
+	def stop(self):
+		print("Stop")
+		self.right_stop()
+		self.left_stop()
+
+	def left(self, x):
+		GPIO.output(self.StepLeftPinBackward, GPIO.HIGH)
+		time.sleep(x)
+		GPIO.output(self.StepLeftPinBackward, GPIO.LOW)
+
+	def right(self, x):
+		GPIO.output(self.StepRightPinBackward, GPIO.HIGH)
+		time.sleep(x)
+		GPIO.output(self.StepRightPinBackward, GPIO.LOW)
+
+
+	def cleanup():
+		GPIO.cleanup()
