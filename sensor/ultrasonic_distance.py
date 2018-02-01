@@ -8,8 +8,8 @@ GPIO.setmode(GPIO.BCM)
 
 #set GPIO Pins
 GPIO_TRIGGER = 18
-GPIO_ECHO = 24
-GPIO_FAR = 25
+GPIO_ECHO = 25
+GPIO_FAR = 17
 GPIO_CLOSE = 22
 
 #set GPIO direction (IN / OUT)
