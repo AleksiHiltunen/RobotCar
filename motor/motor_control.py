@@ -3,6 +3,7 @@ import sys
 import time
 import RPi.GPIO as GPIO
 from multiprocessing import Process
+import threading
 
 # Use BCM GPIO references
 # instead of physical pin numbers
@@ -41,39 +42,41 @@ def setup():
     GPIO.setup(StepRightPinForward, GPIO.OUT)
     GPIO.setup(StepRightPinBackward, GPIO.OUT)
 
-def _left_forward(x):
+def _left_forward():
     GPIO.output(StepLeftPinForward, GPIO.HIGH)
-    time.sleep(x)
-    GPIO.output(StepLeftPinForward, GPIO.LOW)
 
 def _left_back(x):
     GPIO.output(StepLeftPinBackward, GPIO.HIGH)
-    time.sleep(x)
-    GPIO.output(StepLeftPinBackward, GPIO.LOW)
 
-
-def _right_forward(x):
+def _right_forward():
     GPIO.output(StepRightPinForward, GPIO.HIGH)
-    time.sleep(x)
+
+def _right_back():
+    GPIO.output(StepRightPinBackward, GPIO.HIGH)
+
+def _right_stop():
+    GPIO.output(StepRightPinBackward, GPIO.LOW)
     GPIO.output(StepRightPinForward, GPIO.LOW)
 
-def _right_back(x):
-    GPIO.output(StepRightPinBackward, GPIO.HIGH)
-    time.sleep(x)
-    GPIO.output(StepRightPinBackward, GPIO.LOW)
-
+def _left_stop():
+    GPIO.output(StepLeftPinBackward, GPIO.LOW)
+    GPIO.output(StepLeftPinForward, GPIO.LOW)
 
 def forward(x):
-    left_f = Process(target = _left_forward(x))
-    right_f = Process(target = _right_forward(x))
+    left_f = threading.Thread(name="left_forward", target=_left_forward)
+    right_f = threading.Thread(name="right_forward", target=_right_forward)
     left_f.start()
     right_f.start()
 
 def back(x):
-    left_b = Process(target = _left_back(x))
-    right_b = Process(target = _right_back(x))
+    left_b = threading.Thread(name="left_back", target=_left_back)
+    right_b = threading.Thread(name="right_back", target=_right_back)
     left_b.start()
     right_b.start()
+
+def stop():
+    _right_stop()
+    _left_stop()
 
 def left(x):
     GPIO.output(StepLeftPinBackward, GPIO.HIGH)
