@@ -50,7 +50,10 @@ class Sensor():
 		except:
 			print("Something went wrong..")
 			return -1
-		return math.floor(distance)
+
+		distance = math.floor(distance)
+		print(distance)
+		return distance
 
 if __name__ == '__main__':
 	try:

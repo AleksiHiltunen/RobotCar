@@ -61,16 +61,11 @@ class Motor():
 		self.right_stop()
 		self.left_stop()
 
-	def left(self, x):
-		GPIO.output(self.StepLeftPinBackward, GPIO.HIGH)
-		time.sleep(x)
-		GPIO.output(self.StepLeftPinBackward, GPIO.LOW)
+	def left(self):
+		GPIO.output(self.StepLeftPinForward, GPIO.HIGH)
 
-	def right(self, x):
-		GPIO.output(self.StepRightPinBackward, GPIO.HIGH)
-		time.sleep(x)
-		GPIO.output(self.StepRightPinBackward, GPIO.LOW)
-
+	def right(self):
+		GPIO.output(self.StepRightPinForward, GPIO.HIGH)
 
 	def cleanup():
 		GPIO.cleanup()

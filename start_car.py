@@ -3,6 +3,7 @@
 import time
 import os
 import sys
+import random
 my_dir = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.join(my_dir, "sensor"))
 sys.path.append("motor")
@@ -16,14 +17,28 @@ def driver():
 	s = sensor.Sensor()
 
 	while True:
-		dist = s.distance()
-		print("Distance is", dist)
-		if dist > 50:
+		while s.distance() > 30:
 			m.forward()
-		else:
-			m.stop()
-			m.back(1)
-			m.left(1)
+			if s.distance() > 3000:
+				m.stop()
+				m.back(1)
+				m.stop()
+				break
+			time.sleep(0.2)
+
+		m.stop()
+		#m.back(1)
+		m.stop()
+		turn = random.sample(["right", "left"], 1)
+		turn = turn[0]
+		while s.distance() < 70:
+			if turn == "right":
+				m.right()
+			elif turn == "left":
+				m.left()
+			time.sleep(0.2)
+
+		m.stop()
 		time.sleep(0.1)
 
 def main():
